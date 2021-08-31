@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 import os
 import dotenv
@@ -43,12 +43,12 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'FrontieBontie',
-    'corsheaders'
+    'corsheaders',
+    'cookieapp'
 ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -109,7 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'cookieapp.authenticate.CustomAuthentication',
     )
 }
 
@@ -139,3 +139,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000"
 ]
+
+CORS_ALLOW_CREDENTIALS = True
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
+COOKIE_APP = {
+    'ACCESS_NAME': 'access_token',  # Cookie name. Enables cookies if value is set.
+    'REFRESH_NAME': 'refresh_token',  # Cookie name. Enables cookies if value is set.
+    'DOMAIN': None,  # A string like "example.com", or None for standard domain cookie.
+    'SECURE': False,  # Whether the auth cookies should be secure (https:// only).
+    'HTTP_ONLY': True,  # Http only cookie flag.It's not fetch by javascript.
+    'PATH': '/',  # The path of the auth cookie.
+    'SAMESITE': 'Lax'  # Whether to set the flag restricting cookie leaks on cross-site requests.
+    # This can be 'Lax', 'Strict', or None to disable the flag.
+}
