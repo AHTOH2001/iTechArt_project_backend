@@ -3,6 +3,8 @@ from rest_framework.generics import RetrieveAPIView, CreateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.conf import settings
 
+from .serializers import ProfileSerializer, UserSerializer
+
 
 class ProfileView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
@@ -24,3 +26,8 @@ class LogOutView(CreateAPIView):
             samesite=settings.COOKIE_APP['SAMESITE'],
         )
         return response
+
+
+class SignUpView(CreateAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = ProfileSerializer
