@@ -1,9 +1,11 @@
+from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView, CreateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.conf import settings
 
-from .serializers import ProfileSerializer, UserSerializer
+from .serializers import ProfileSerializer
 
 
 class ProfileView(RetrieveAPIView):
@@ -31,3 +33,10 @@ class LogOutView(CreateAPIView):
 class SignUpView(CreateAPIView):
     permission_classes = [AllowAny]
     serializer_class = ProfileSerializer
+
+    def post(self, request, *args, **kwargs):
+        try:
+            response = super(SignUpView, self).post(request, *args, **kwargs)
+        except ValidationError as e:
+            return Response({'detail': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+        return response
