@@ -45,7 +45,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         except User.DoesNotExist:
             return user
         else:
-            if existing_user == self.instance:
+            if existing_user == self.instance.user:
                 return user
             else:
                 raise ValidationError({'username': ['User with this username already exists']})
