@@ -1,4 +1,5 @@
 from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
@@ -6,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.conf import settings
 
 from .models import Profile
-from .serializers import ProfileSerializer
+from .serializers import ProfileSerializer, ChangePasswordSerializer
 
 
 class ProfileView(RetrieveUpdateDestroyAPIView):
@@ -50,3 +51,14 @@ class SignUpView(CreateAPIView):
         except ValidationError as e:
             return Response({'detail': e.detail}, status=status.HTTP_400_BAD_REQUEST)
         return response
+
+
+@api_view(http_method_names=['PATCH'])
+@permission_classes([IsAuthenticated])
+def change_password_view(request):
+    serializer = ChangePasswordSerializer(request.user, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(status=status.HTTP_200_OK)
+    else:
+        return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
