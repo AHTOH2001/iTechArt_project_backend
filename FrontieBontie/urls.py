@@ -5,4 +5,5 @@ urlpatterns = [
     path('profile/', ProfileView.as_view()),
     path('logout/', LogOutView.as_view()),
     path('signup/', SignUpView.as_view()),
+    path('change-password/', change_password_view)
 ]

@@ -1,19 +1,30 @@
 from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from rest_framework.generics import RetrieveAPIView, CreateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.conf import settings
 
-from .serializers import ProfileSerializer
+from .models import Profile
+from .serializers import ProfileSerializer, ChangePasswordSerializer
 
 
-class ProfileView(RetrieveAPIView):
+class ProfileView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = ProfileSerializer
+    queryset = Profile.objects.all()
 
-    def get(self, request, *args, **kwargs):
-        user = request.user
-        return Response({'username': user.username, 'email': user.email})
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        return queryset.get(user=self.request.user)
+
+    def patch(self, request, *args, **kwargs):
+        try:
+            response = super(ProfileView, self).patch(request, *args, **kwargs)
+        except ValidationError as e:
+            return Response({'detail': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+        return response
 
 
 class LogOutView(CreateAPIView):
@@ -40,3 +51,14 @@ class SignUpView(CreateAPIView):
         except ValidationError as e:
             return Response({'detail': e.detail}, status=status.HTTP_400_BAD_REQUEST)
         return response
+
+
+@api_view(http_method_names=['PATCH'])
+@permission_classes([IsAuthenticated])
+def change_password_view(request):
+    serializer = ChangePasswordSerializer(request.user, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(status=status.HTTP_200_OK)
+    else:
+        return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
