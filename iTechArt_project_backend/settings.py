@@ -157,3 +157,5 @@ COOKIE_APP = {
     'SAMESITE': 'Lax'  # Whether to set the flag restricting cookie leaks on cross-site requests.
     # This can be 'Lax', 'Strict', or None to disable the flag.
 }
+
+EMAIL_PORT = 1025
