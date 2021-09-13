@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from rest_framework.exceptions import ValidationError
 
-from .models import Profile
+from .models import Profile, Product
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -64,3 +64,13 @@ class ChangePasswordSerializer(serializers.Serializer):
         instance.set_password(validated_data['password_new'])
         instance.save()
         return instance
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['category', 'title', 'description', 'price', 'owner']
+
+    # def create(self, validated_data):
+    #     product = Product.objects.create(**validated_data, owner=self.)
+    #     return product
