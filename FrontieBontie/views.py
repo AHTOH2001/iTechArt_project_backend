@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.conf import settings
 
 from .models import Profile
-from .serializers import ProfileSerializer, ChangePasswordSerializer
+from .serializers import ProfileSerializer, ChangePasswordSerializer, ResetPasswordSerializer
 
 
 class ProfileView(RetrieveUpdateDestroyAPIView):
@@ -57,6 +57,17 @@ class SignUpView(CreateAPIView):
 @permission_classes([IsAuthenticated])
 def change_password_view(request):
     serializer = ChangePasswordSerializer(request.user, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(status=status.HTTP_200_OK)
+    else:
+        return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(http_method_names=['POST'])
+@permission_classes([AllowAny])
+def reset_password_view(request):
+    serializer = ResetPasswordSerializer(request.user, data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(status=status.HTTP_200_OK)

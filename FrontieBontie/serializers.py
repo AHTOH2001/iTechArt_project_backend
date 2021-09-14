@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from rest_framework.exceptions import ValidationError
+from django.core.mail import send_mail
 
 from .models import Profile
 
@@ -45,7 +46,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         except User.DoesNotExist:
             return user
         else:
-            if existing_user == self.instance.user:
+            if self.instance and existing_user == self.instance.user:
                 return user
             else:
                 raise ValidationError({'username': ['User with this username already exists']})
@@ -64,3 +65,15 @@ class ChangePasswordSerializer(serializers.Serializer):
         instance.set_password(validated_data['password_new'])
         instance.save()
         return instance
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def save(self, **kwargs):
+        email = self.validated_data['email']
+        send_mail(
+            'Subject here', 'Here is the message.',
+            'from@example.com', [email],
+            fail_silently=False,
+        )
