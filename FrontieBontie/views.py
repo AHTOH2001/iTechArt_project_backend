@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.conf import settings
 
 from .models import Profile
-from .serializers import ProfileSerializer, ChangePasswordSerializer, ResetPasswordSerializer
+from .serializers import ProfileSerializer, ChangePasswordSerializer, ProductSerializer, ResetPasswordSerializer
 
 
 class ProfileView(RetrieveUpdateDestroyAPIView):
@@ -63,6 +63,24 @@ def change_password_view(request):
     else:
         return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
+
+class AddProductView(CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProductSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data={**request.data, 'owner': request.user.pk})
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            response = super(AddProductView, self).post(request, *args, **kwargs)
+        except ValidationError as e:
+            return Response({'detail': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+        return response
 
 @api_view(http_method_names=['POST'])
 @permission_classes([AllowAny])

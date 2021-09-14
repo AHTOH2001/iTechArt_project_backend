@@ -4,7 +4,7 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from rest_framework.exceptions import ValidationError
 from django.core.mail import send_mail
 
-from .models import Profile
+from .models import Profile, Product
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -67,6 +67,13 @@ class ChangePasswordSerializer(serializers.Serializer):
         return instance
 
 
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['category', 'title', 'description', 'price', 'owner']
+
+    
 class ResetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
