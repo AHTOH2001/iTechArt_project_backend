@@ -1,4 +1,5 @@
 from django.urls import path
+
 from .views import *
 
 urlpatterns = [
@@ -8,4 +9,5 @@ urlpatterns = [
     path('change-password/', change_password_view),
     path('add-product/', AddProductView.as_view()),
     path('reset-password/', reset_password_view),
+    path('categories/', CategoryView.as_view())
 ]
