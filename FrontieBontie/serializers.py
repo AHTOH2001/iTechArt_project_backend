@@ -1,10 +1,10 @@
-from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.validators import UnicodeUsernameValidator
-from rest_framework.exceptions import ValidationError
 from django.core.mail import send_mail
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
-from .models import Profile, Product
+from .models import Profile, Product, Category
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -67,13 +67,12 @@ class ChangePasswordSerializer(serializers.Serializer):
         return instance
 
 
-
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['category', 'title', 'description', 'price', 'owner']
 
-    
+
 class ResetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
@@ -84,3 +83,9 @@ class ResetPasswordSerializer(serializers.Serializer):
             'from@example.com', [email],
             fail_silently=False,
         )
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'title']

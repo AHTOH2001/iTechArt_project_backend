@@ -1,13 +1,14 @@
+from django.conf import settings
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import ValidationError
-from rest_framework.response import Response
-from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.conf import settings
+from rest_framework.response import Response
 
-from .models import Profile
-from .serializers import ProfileSerializer, ChangePasswordSerializer, ProductSerializer, ResetPasswordSerializer
+from .models import Profile, Category
+from .serializers import (ProfileSerializer, ChangePasswordSerializer, ProductSerializer, ResetPasswordSerializer,
+                          CategorySerializer)
 
 
 class ProfileView(RetrieveUpdateDestroyAPIView):
@@ -82,6 +83,7 @@ class AddProductView(CreateAPIView):
             return Response({'detail': e.detail}, status=status.HTTP_400_BAD_REQUEST)
         return response
 
+
 @api_view(http_method_names=['POST'])
 @permission_classes([AllowAny])
 def reset_password_view(request):
@@ -91,3 +93,9 @@ def reset_password_view(request):
         return Response(status=status.HTTP_200_OK)
     else:
         return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CategoryView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CategorySerializer
+    queryset = Category.objects.all()
